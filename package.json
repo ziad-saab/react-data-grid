@@ -1,14 +1,14 @@
 {
-  "name": "react-data-grid",
-  "version": "7.0.0-beta.7",
+  "name": "@ziad-saab/react-data-grid",
+  "version": "7.2.1-beta.7",
   "license": "MIT",
   "description": "Feature-rich and customizable data grid React component",
   "keywords": [
     "react",
     "data grid"
   ],
-  "repository": "github:adazzle/react-data-grid",
-  "bugs": "https://github.com/adazzle/react-data-grid/issues",
+  "repository": "github:ziad-saab/react-data-grid",
+  "bugs": "https://github.com/ziad-saab/react-data-grid/issues",
   "type": "module",
   "exports": {
     ".": {
@@ -26,8 +26,6 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "start": "webpack serve --mode=development",
-    "build:website": "webpack --mode=production",
     "build": "rollup --config --no-stdin",
     "build:types": "tsc && api-extractor run --local --verbose",
     "test": "jest",

@@ -144,6 +144,8 @@ export interface DataGridProps<R, SR = unknown, K extends Key = Key> extends Sha
   onScroll?: Maybe<(event: React.UIEvent<HTMLDivElement>) => void>;
   /** Called when a column is resized */
   onColumnResize?: Maybe<(idx: number, width: number) => void>;
+  /** Called when a cell is selected */
+  onSelectedCellChange?: Maybe<(position: Position) => void>;
 
   /**
    * Toggles and modes
@@ -196,6 +198,7 @@ function DataGrid<R, SR, K extends Key>(
     onRowDoubleClick,
     onScroll,
     onColumnResize,
+    onSelectedCellChange,
     onFill,
     onPaste,
     // Toggles and modes
@@ -620,7 +623,7 @@ function DataGrid<R, SR, K extends Key>(
     column.editorOptions?.onCellKeyDown?.(event);
     if (event.isDefaultPrevented()) return;
 
-    if (isCellEditable(selectedPosition) && isDefaultCellInput(event)) {
+    if (isCellEditable(selectedPosition) && isDefaultCellInput(event) && !isCtrlKeyHeldDown(event)) {
       setSelectedPosition(({ idx, rowIdx }) => ({
         idx,
         rowIdx,
@@ -663,12 +666,14 @@ function DataGrid<R, SR, K extends Key>(
 
     if (enableEditor && isCellEditable(position)) {
       const row = rows[position.rowIdx] as R;
+      onSelectedCellChange?.(position);
       setSelectedPosition({ ...position, mode: 'EDIT', row, originalRow: row });
     } else if (isSamePosition(selectedPosition, position)) {
       // Avoid re-renders if the selected cell state is the same
       // TODO: replace with a #record? https://github.com/microsoft/TypeScript/issues/39831
       scrollToCell(position);
     } else {
+      onSelectedCellChange?.(position);
       setSelectedPosition({ ...position, mode: 'SELECT' });
     }
   }
@@ -938,10 +943,10 @@ function DataGrid<R, SR, K extends Key>(
             selectedIdx > viewportColumns[viewportColumns.length - 1].idx
               ? [...viewportColumns, selectedColumn]
               : [
-                  ...viewportColumns.slice(0, lastFrozenColumnIndex + 1),
-                  selectedColumn,
-                  ...viewportColumns.slice(lastFrozenColumnIndex + 1)
-                ];
+                ...viewportColumns.slice(0, lastFrozenColumnIndex + 1),
+                selectedColumn,
+                ...viewportColumns.slice(lastFrozenColumnIndex + 1)
+              ];
         }
       }
 
